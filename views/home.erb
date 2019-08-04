@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Silver Search</title>
+  <link href="/style.css" rel="stylesheet" type="text/css" />
+  <meta content="width=device-width" name="viewport" />
+  <script charset="utf-8" src=""></script>
+</head>
+<body>
+  <br>
+  <br>
+  <main>
+    <form method="get" action="/">
+    <input type="text" name="query" value="<%= h query %>">
+    <button>Search</button>
+  </form>
+  <br>
+  <% results.each do |result| %>
+  <div class="match match<%= result[:relevance] %>">
+    <h2><%= result['Name'] %></h2>
+    <h3><%= result['Type'] %></h3>
+    <p><%= result['Designed by'] %></p>
+  </div>
+  <% end %>
+  </main>
+</body>
+</html>
