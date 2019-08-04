@@ -15,7 +15,7 @@
     <button>Search</button>
   </form>
   <br>
-  <% results.each do |result| %>
+  <% results.sort_by{|res| res[:relevance] }.each do |result| %>
   <div class="match match<%= result[:relevance] %>">
     <h2><%= result['Name'] %></h2>
     <h3><%= result['Type'] %></h3>
