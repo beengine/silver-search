@@ -1,6 +1,7 @@
 ## Silver Search
 
 [DEMO](http://silversearch.herokuapp.com/)
+![Graph](public/graph.jpg?raw=true)
 
 * Ruby 2.6.3
 * Sinatra 2.0.5
