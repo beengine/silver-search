@@ -1,4 +1,7 @@
 require 'aasm'
+#parses user query to slices and generates regexes for data search
+#to parse user query finite-state machine is used
+#aasm gem used to provide state machine functionality
 class ParserMachine
 
   include AASM
@@ -6,13 +9,13 @@ class ParserMachine
   attr_accessor :regexes
 
   aasm do
-    state :nill, initial: true, enter: :skip_char
-    state :word, enter: :write_char_to_slice
-    state :exact_match, enter: :write_char_to_slice
-    state :negative_thing
-    state :negative_word, enter: :write_char_to_negative_slice
-    state :negative_exact_match, enter: :write_char_to_negative_slice
-    state :end
+    state :nill, initial: true, enter: :skip_char   # initial state, state when parser outside of any slice
+    state :word, enter: :write_char_to_slice        # adding ordinary word
+    state :exact_match, enter: :write_char_to_slice # adding exact match
+    state :negative_thing                           # happens right after dash, may transition to negative word or negative exact match
+    state :negative_word, enter: :write_char_to_negative_slice        # adding negative word
+    state :negative_exact_match, enter: :write_char_to_negative_slice # adding negative exact match, like -"something lame"
+    state :end # end of query
 
     after_all_events :run_next_step
 
@@ -46,7 +49,7 @@ class ParserMachine
       transitions from: :negative_exact_match, to: :negative_exact_match
     end
 
-    event :eof do
+    event :eos do
       transitions from: [:nill, :word, :exact_match, :negative_thing, :negative_word, :negative_exact_match], to: :end
     end
   end
@@ -84,7 +87,7 @@ class ParserMachine
     @negative_slices << ''
   end
 
-  def run_next_step
+  def run_next_step # taking next char to analyze
     return if self.end?
     case @char
     when '-'
@@ -94,7 +97,7 @@ class ParserMachine
     when ' '
       self.space
     when nil
-      self.eof
+      self.eos
     else
       self.other_char
     end
@@ -102,10 +105,10 @@ class ParserMachine
 
   def generate_regexes
     @regexes = {
-      exact_match: Regexp.new(@slices.join(' '), true),
-      any_order:   Regexp.new("^#{@slices.map{|s| '(?=.*' + s + ')'}.join}.*$", true),
-      any_word:    Regexp.new(@slices.join('|'), true)
+      exact_match: Regexp.new(@slices.join(' '), true),                                # exact match, all slices in query to match data
+      any_order:   Regexp.new("^#{@slices.map{|s| '(?=.*' + s + ')'}.join}.*$", true), # regex to match when all slices match but in arbitrary order
+      any_word:    Regexp.new(@slices.join('|'), true)                                 # regex to match any word in query
     }
-    @regexes[:negative] = Regexp.new(@negative_slices.join('|'), true) unless @negative_slices.empty?
+    @regexes[:negative] = Regexp.new(@negative_slices.join('|'), true) unless @negative_slices.empty? #negative regex
   end
 end
