@@ -1,7 +1,6 @@
 ## Silver Search
 
 [DEMO](http://silversearch.herokuapp.com/)
-![Graph](public/graph.jpg?raw=true)
 
 * Ruby 2.6.3
 * Sinatra 2.0.5
@@ -11,6 +10,8 @@
 Silver Search contains two classes, which provide search - SearchMachine and ParserMachine.
 
 ### ParserMachine
+
+![Graph](public/graph.jpg?raw=true)
 
 ParserMachine parses user query to slices and generates regexes for data search. Slice is an atomic object in our implementation. Generally, parser works with 4 types of "data": words, exact mathces, negative words and negative exact matches.
 * Word is just a word, surrounded with spaces, e. g. `lisp`
